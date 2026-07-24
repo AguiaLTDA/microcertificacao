@@ -227,8 +227,8 @@
 <section class="stats">
   <div class="wrap">
     <div class="grid">
-      <div class="stat reveal"><b id="st-cursos" data-target="48">0</b><span>Microcertificações</span></div>
-      <div class="stat reveal"><b id="st-areas" data-target="15">0</b><span>Áreas de conhecimento</span></div>
+      <div class="stat reveal"><b id="st-cursos" data-target="48">48</b><span>Microcertificações</span></div>
+      <div class="stat reveal"><b id="st-areas" data-target="15">15</b><span>Áreas de conhecimento</span></div>
       <div class="stat reveal"><b>3</b><span>Grandes trilhas</span></div>
       <div class="stat reveal"><b>R$0</b><span>Custo de inscrição</span></div>
     </div>
@@ -453,13 +453,20 @@ function tick(){
 }
 tick(); setInterval(tick,1000);
 
+// Contadores — disparam no carregamento da página, não dependem de rolagem,
+// então o número correto aparece sempre, mesmo se a seção nunca "entrar em vista".
 function countUp(el){
-  const t = +el.dataset.target; let cur=0;
+  const t = +el.dataset.target;
+  if(!t){ return; }
+  let cur=0;
   const step = Math.max(1, Math.round(t/40));
   const iv = setInterval(()=>{ cur+=step; if(cur>=t){cur=t;clearInterval(iv);} el.textContent=cur; },28);
 }
+[document.getElementById('st-cursos'), document.getElementById('st-areas')].forEach(countUp);
+
+// Reveal on scroll (apenas efeito visual de fade-in, não afeta os números)
 const io = new IntersectionObserver((entries)=>{
-  entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); if(en.target.dataset.target) countUp(en.target); io.unobserve(en.target);} });
+  entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
 },{threshold:.3});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 </script>

@@ -242,8 +242,8 @@
 <section class="stats">
   <div class="wrap">
     <div class="grid">
-      <div class="stat reveal"><b id="st-cursos">0</b><span>Microcertificações</span></div>
-      <div class="stat reveal"><b id="st-areas">0</b><span>Áreas de conhecimento</span></div>
+      <div class="stat reveal"><b id="st-cursos" data-target="48">48</b><span>Microcertificações</span></div>
+      <div class="stat reveal"><b id="st-areas" data-target="15">15</b><span>Áreas de conhecimento</span></div>
       <div class="stat reveal"><b>3</b><span>Grandes trilhas</span></div>
       <div class="stat reveal"><b>R$0</b><span>Custo de inscrição</span></div>
     </div>
@@ -406,10 +406,12 @@ const AREAS = [
   ]},
 ];
 
-// Derived counts
+// Derived counts (mantém o HTML sempre correto, mesmo se a lista de cursos mudar)
 const allCourses = AREAS.flatMap(a=>a.courses);
 document.getElementById('st-cursos').dataset.target = allCourses.length;
 document.getElementById('st-areas').dataset.target = AREAS.length;
+document.getElementById('st-cursos').textContent = allCourses.length;
+document.getElementById('st-areas').textContent = AREAS.length;
 
 // Marquee
 const mq = document.getElementById('marquee');
@@ -489,15 +491,20 @@ function tick(){
 }
 tick(); setInterval(tick,1000);
 
-// Count-up stats
+// Count-up stats — dispara no carregamento da página, não depende de rolagem,
+// então o número correto aparece sempre, mesmo se a seção nunca "entrar em vista".
 function countUp(el){
-  const target = +el.dataset.target; let cur=0;
+  const target = +el.dataset.target;
+  if(!target){ return; }
+  let cur=0;
   const step = Math.max(1, Math.round(target/40));
   const iv = setInterval(()=>{ cur+=step; if(cur>=target){cur=target;clearInterval(iv);} el.textContent=cur; },28);
 }
-// Reveal on scroll
+[document.getElementById('st-cursos'), document.getElementById('st-areas')].forEach(countUp);
+
+// Reveal on scroll (apenas efeito visual de fade-in, não afeta os números)
 const io = new IntersectionObserver((entries)=>{
-  entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); if(en.target.dataset.target) countUp(en.target); io.unobserve(en.target);} });
+  entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
 },{threshold:.3});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 </script>
